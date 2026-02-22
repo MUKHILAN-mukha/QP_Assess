@@ -1,0 +1,12 @@
+fastapi[standard]
+uvicorn
+chromadb
+sentence-transformers
+PyMuPDF
+langchain
+langchain-community
+duckduckgo-search
+google-genai
+python-dotenv
+python-multipart
+pydantic
