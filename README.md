@@ -104,3 +104,39 @@ AssessAI is built on a modern decoupled architecture, separating a React-based i
    npm run dev
    ```
 4. Access the application in your browser at `http://localhost:5173`.
+
+---
+
+## 🔒 100% Offline Deployment (No API Keys Required)
+
+By default, AssessAI uses the **Groq API** (Llama-3.3-70B) for the language model. However, if you are deploying this on a powerful workstation (e.g., an i9 processor, 32GB System RAM, and 24GB VRAM like an RTX 3090/4090), you can run the entire platform **completely offline** for maximum privacy and zero API rate limits.
+
+### Recommended Offline Model: `Qwen 2.5 (32B)`
+The `Qwen2.5-32B-Instruct` model (quantized to 4-bit) is perfectly optimized for a 24GB VRAM graphics card. It takes up ~19GB of memory, leaving enough headroom for massive textbook contexts. 
+
+### Step 1: Install Ollama
+1. Download and install [Ollama](https://ollama.com/) on the host machine.
+2. Open a terminal and run the following command to download the 32B logic engine:
+   ```bash
+   ollama run qwen2.5:32b
+   ```
+   *(This will download an ~20GB file. Let it finish).*
+
+### Step 2: Reroute the Backend
+1. Open `backend/rag/generator.py` in your code editor.
+2. Locate the `__init__` function inside the `Generator` class (around line 10).
+3. **Replace**:
+   ```python
+   self.client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+   self.model_id = "llama-3.3-70b-versatile" 
+   ```
+4. **With**:
+   ```python
+   from openai import OpenAI
+   
+   # Point the backend to your local Ollama server
+   self.client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
+   self.model_id = "qwen2.5:32b"
+   ```
+
+Restart your FastAPI server. AssessAI is now running perfectly offline on your graphics card.
